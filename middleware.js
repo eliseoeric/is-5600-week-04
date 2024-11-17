@@ -16,7 +16,7 @@ function cors (req, res, next) {
     res.setHeader('Access-Control-Allow-Headers', 'X-Requested-With, X-HTTP-Method-Override, Content-Type, Accept')
   
     next()
-  }
+}
 
   function handleError (err, req, res, next) {
     console.error(err)
