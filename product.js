@@ -1,5 +1,4 @@
 const fs = require('fs').promises
-const { get } = require('http');
 const path = require('path')
 
 const productsFile = path.join(__dirname, 'data/full-products.json')
@@ -28,8 +27,18 @@ async function get (id) {
 
       return null;
 }
+async function deleteProduct(id) {
+console.log(‘product with ID ${id} has been deleted.’);
+return true;
+async function updateProduct(id, updatedData) {
+console.log(product with ID ${id} has been updated with data:’, updatedData);
+return true
+}
 
 module.exports = {
     list,
     get
+    delete: deleteProduct,
+    update: updateProduct,	
+	
 }
