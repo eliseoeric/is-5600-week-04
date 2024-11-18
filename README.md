@@ -160,7 +160,7 @@ async function listProducts (req, res) {
   try {
     // Pass the limit and offset to the Products service
     res.json(await Products.list({
-      offset: Number(offset),
+        offset: Number(offset),
       limit: Number(limit)
     }))
   } catch (err) {
@@ -318,9 +318,8 @@ function handleError (err, req, res, next) {
   console.error(err)
   
   // If the response has already been sent, we can't send another response
-  if (res.headersSent) {
-    return next(err)
-  }
+  
+  
 
   // Send a 500 error response
   res.status(500).json({ error: "Internal Error Occurred" })
