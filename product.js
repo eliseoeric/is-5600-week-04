@@ -44,7 +44,6 @@ function updateProduct(productId, updatedData) {
     console.log(`Product with ID ${productId} has been updated with data:`, updatedData);
     // Simulate product update (no real update logic needed for this lab)
 }
-
  
 module.exports = {
     list,
