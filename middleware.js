@@ -1,3 +1,10 @@
+// middleware.js
+/**
+ * Set the CORS headers on the response object
+ * @param {object} req
+ * @param {object} res
+ * @param {function} next
+ */
 function cors (req, res, next) {
   const origin = req.headers.origin
 
@@ -14,12 +21,12 @@ function cors (req, res, next) {
 function handleError (err, req, res, next) {
   // Log the error to our server's console
   console.error(err)
-  
+
   // If the response has already been sent, we can't send another response
   if (res.headersSent) {
     return next(err)
   }
-
+  
   // Send a 500 error response
   res.status(500).json({ error: "Internal Error Occurred" })
 }
@@ -30,6 +37,6 @@ function notFound (req, res) {
 
 module.exports = {
   cors,
-  notFound,
   handleError,
+  notFound,
 }
