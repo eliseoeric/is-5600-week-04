@@ -9,7 +9,6 @@ async function list (options = {}) {
  
   const data = await fs.readFile(productsFile)
   return JSON.parse(data)
-    //fitler
     .filter(product => {
       if (!tag) {
         return product

@@ -2,12 +2,6 @@ const path = require('path')
 const Products = require('./products')
 const autoCatch = require('./lib/auto-catch')
 
-
- /**
- * Handle the root route
- * @param {object} req
- * @param {object} res
-*/
 function handleRoot (req, res) {
   res.sendFile(path.join(__dirname, '/index.html'));
 }
