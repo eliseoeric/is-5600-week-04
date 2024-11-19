@@ -1,4 +1,3 @@
-const fs = require('fs').promises
 const express = require('express')
 const api = require('./api')
 const middleware = require('./middleware')

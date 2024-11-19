@@ -1,4 +1,3 @@
-const fs = require('fs').primises
 const path = require('path')
 const Products = require('./products')
 const autoCatch = require('./lib/auto-catch')
