@@ -1,10 +1,3 @@
-// middleware.js
-/**
- * Set the CORS headers on the response object
- * @param {object} req
- * @param {object} res
- * @param {function} next
- */
 function cors (req, res, next) {
   const origin = req.headers.origin
 
