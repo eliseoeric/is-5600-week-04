@@ -31,3 +31,29 @@ app.use(middleware.handleError); // Handle other errors
 
 // Start the server
 app.listen(port, () => console.log(`Server listening on port ${port}`));
+
+// ---- Additional Functions ---- //
+
+/**
+ * Handle the root route.
+ * @param {object} req
+ * @param {object} res
+ */
+function handleRoot(req, res) {
+  res.sendFile(path.join(__dirname, '/index.html'));
+}
+
+/**
+ * List all products.
+ * @param {object} req
+ * @param {object} res
+ */
+async function listProducts(req, res) {
+  const productsFile = path.join(__dirname, 'data/full-products.json');
+  try {
+    const data = await fs.readFile(productsFile, 'utf-8');
+    res.json(JSON.parse(data));
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+}
