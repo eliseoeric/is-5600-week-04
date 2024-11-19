@@ -1,6 +1,7 @@
-const fs = require('fs').promises
-const path = require('path')
 const express = require('express')
+const api = require('./api')
+const middleware = require('./middleware')
+const bodyParser = require('body-parser')
 
 // Set the port
 const port = process.env.PORT || 3000
@@ -9,31 +10,39 @@ const app = express()
 // Register the public directory
 app.use(express.static(__dirname + '/public'));
 // register the routes
-app.get('/products', listProducts)
-app.get('/', handleRoot);
+app.use(middleware.cors)
+app.use(bodyParser.json())
+app.get('/products', api.listProducts)
+app.get('/', api.handleRoot);
+app.post('/products', api.createProduct)
+app.get('/products/:id', api.getProduct) 
+app.use(middleware.handleError)
+app.use(middleware.notFound)
 // Boot the server
 app.listen(port, () => console.log(`Server listening on port ${port}`))
 
-/**
- * Handle the root route
- * @param {object} req
- * @param {object} res
-*/
-function handleRoot(req, res) {
-  res.sendFile(path.join(__dirname, '/index.html'));
-}
+const express = require('express');
+const products = require('./products'); // Assuming products.js is in the same directory
 
-/**
- * List all products
- * @param {object} req
- * @param {object} res
- */
-async function listProducts(req, res) {
-  const productsFile = path.join(__dirname, 'data/full-products.json')
-  try {
-    const data = await fs.readFile(productsFile)
-    res.json(JSON.parse(data))
-  } catch (err) {
-    res.status(500).json({ error: err.message })
-  }
-}
+const app = express();
+app.use(express.json());
+
+// Existing routes...
+
+// DELETE route to delete a product
+app.delete('/products/:id', (req, res) => {
+    products.deleteProduct(req, res);
+});
+
+// PUT route to update a product
+app.put('/products/:id', (req, res) => {
+    products.updateProduct(req, res);
+});
+
+// Start the server
+const PORT = 3000;
+app.listen(PORT, () => {
+    console.log(`Server is running on port ${PORT}`);
+});
+
+module.exports = app;
