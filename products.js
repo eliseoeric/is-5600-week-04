@@ -1,3 +1,4 @@
+const fs = require('fs').promises
 const { get } = require('express/lib/response')
 const path = require('path')
 const { title } = require('process')
@@ -36,5 +37,5 @@ async function list (options = {}) {
 
   module.exports = {
     list,
-    get
+    get,
   }
