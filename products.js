@@ -5,7 +5,8 @@ const path = require('path')
 const productsFile = path.join(__dirname, 'data/full-products.json')
 
 module.exports = {
-  list
+  list,
+  get
 }
 
 
