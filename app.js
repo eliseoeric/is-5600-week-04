@@ -9,7 +9,7 @@ const middleware = require('./middleware')
 const port = process.env.PORT || 3000
 // Boot the app
 const app = express()
-// app.use(express.json());
+
 
 app.use(express.static(__dirname + '/public'));
 
