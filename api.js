@@ -1,4 +1,5 @@
 // api.js
+const fs = require('fs').promises
 const path = require('path')
 const Products = require('./products')
 
@@ -21,12 +22,9 @@ async function listProducts (req, res) {
   // Add CORS headers
   res.setHeader('Access-Control-Allow-Origin', '*')
   
-  // Read the products file
-  const productsFile = path.join(__dirname, 'data/full-products.json')
   
   try {
-    const data = await fs.readFile(productsFile)
-    res.json(JSON.parse(data))
+    res.json(await Products.list()) // Use the Products service
   } catch (err) {
     res.status(500).json({ error: err.message })
   }
@@ -37,15 +35,4 @@ module.exports = {
   listProducts
 }
 
-/**
- * List all products
- * @param {object} req
- * @param {object} res
- */
-async function listProducts (req, res) {
-  try {
-    res.json(await Products.list()) // Use the Products service
-  } catch (err) {
-    res.status(500).json({ error: err.message })
-  }
-}
+  
