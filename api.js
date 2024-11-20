@@ -78,7 +78,8 @@ async function createProduct (req, res) {
 module.exports = autoCatch({
   handleRoot,
   listProducts,
-  getProduct
+  getProduct,
+  createProduct,
 });
 
   
