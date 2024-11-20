@@ -3,7 +3,8 @@ const express = require('express')
 const api = require('./api')
 const middleware = require('middleware')
 const bodyParser = require('body-parser')
-
+const express = require('express');
+const products = require('./products');
 
 // Set the port
 const port = process.env.PORT || 3000
@@ -20,6 +21,20 @@ app.get('/', api.handleRoot)
 app.get('/products', api.listProducts)
 app.get('/products/:id', api.getProduct)
 app.post('/products', api.createProduct)
+const app = express();
+
+app.use(express.json());
+
+// DELETE route
+app.delete('/products/:id', products.deleteProduct);
+
+// PUT route
+app.put('/products/:id', products.updateProduct);
+
+const port = 3000;
+app.listen(port, () => {
+    console.log(`Server running on http://localhost:${port}`);
+});
 
 // Boot the server
 app.listen(port, () => console.log(`Server listening on port ${port}`))
