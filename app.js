@@ -1,18 +1,29 @@
-const fs = require('fs').promises
-const path = require('path')
-const express = require('express')
+const express = require('express');
+const app = express();
+const bodyParser = require('body-parser');
+const api = require('./api');
+const middleware = require('./middleware');
 
-// Set the port
-const port = process.env.PORT || 3000
-// Boot the app
-const app = express()
-// Register the public directory
-app.use(express.static(__dirname + '/public'));
-// register the routes
-app.get('/products', listProducts)
-app.get('/', handleRoot);
-// Boot the server
-app.listen(port, () => console.log(`Server listening on port ${port}`))
+// Middleware
+app.use(middleware.cors);
+app.use(middleware.handleError);
+
+// Routes
+app.get('/', api.handleRoot);
+app.get('/products', api.listProducts);
+app.get('/products/:id', api.getProduct);
+app.post('/products', api.createProduct);
+app.put('/products/:id', api.updateProduct);
+app.delete('/products/:id', api.deleteProduct);
+
+// 404 Not Found
+app.use(middleware.notFound);
+
+// Start server
+const PORT = 3000;
+app.listen(PORT, () => {
+  console.log(`Server running on http://localhost:${PORT}`);
+});
 
 /**
  * Handle the root route
