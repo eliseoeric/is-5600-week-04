@@ -48,3 +48,16 @@ async function get (id) {
    // If no product is found, return null
   return null;
 }
+
+// products.js
+
+exports.deleteProduct = (req, res) => {
+    console.log(`Product with ID ${req.params.id} deleted.`);
+    res.status(202).send({ message: 'Product deleted.' });
+};
+
+exports.updateProduct = (req, res) => {
+    console.log(`Product with ID ${req.params.id} updated.`);
+    res.status(200).send({ message: 'Product updated.' });
+};
+
