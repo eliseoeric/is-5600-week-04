@@ -21,14 +21,21 @@ function handleRoot (req, res) {
 async function listProducts (req, res) {
   // Add CORS headers
   res.setHeader('Access-Control-Allow-Origin', '*')
-  
-  
+
+  // Extract the limit and offset query parameters
+  const { offset = 0, limit = 25 } = req.query
+
   try {
-    res.json(await Products.list()) // Use the Products service
+    // Pass the limit and offset to the Products service
+    res.json(await Products.list({
+      offset: Number(offset),
+      limit: Number(limit)
+    }))
   } catch (err) {
     res.status(500).json({ error: err.message })
   }
 }
+  
 
 module.exports = {
   handleRoot,
