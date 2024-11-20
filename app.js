@@ -14,8 +14,6 @@ app.use(express.static(__dirname + '/public'));
 
 // register the middleware
 app.use(middleware.cors)
-app.use(middleware.handleError)
-app.use(middleware.notFound)
 app.use(bodyParser.json())
 
 
@@ -26,6 +24,9 @@ app.get('/products/:id', api.getProduct)
 app.post('/products', api.createProduct)
 app.delete('/products/:id', api.deleteProduct);
 app.put('/products/:id', api.updateProduct);
+
+app.use(middleware.handleError)
+app.use(middleware.notFound)
 
 // Boot the server
 app.listen(port, () => console.log(`Server listening on port ${port}`))
