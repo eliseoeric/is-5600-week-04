@@ -18,7 +18,7 @@ function handleRoot (req, res) {
  * @param {object} req
  * @param {object} res
  */
-async function listProducts (req, res) {
+async function listProducts (req, res,next) {
   // Add CORS headers
   res.setHeader('Access-Control-Allow-Origin', '*')
   const { id } = req.params
