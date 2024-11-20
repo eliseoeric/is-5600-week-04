@@ -23,13 +23,15 @@ async function listProducts (req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*')
 
   // Extract the limit and offset query parameters
-  const { offset = 0, limit = 25 } = req.query
+  const { offset = 0, limit = 25 , tag} = req.query
 
   try {
     // Pass the limit and offset to the Products service
     res.json(await Products.list({
       offset: Number(offset),
-      limit: Number(limit)
+      limit: Number(limit),
+      tag,
+   
     }))
   } catch (err) {
     res.status(500).json({ error: err.message })
