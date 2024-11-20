@@ -1,50 +1,30 @@
-const express = require('express');
-const app = express();
-const bodyParser = require('body-parser');
-const api = require('./api');
-const middleware = require('./middleware');
+const express = require('express')
+const api = require('./api')
+const middleware = require('./middleware')
+const bodyParser = require('body-parser')
 
-// Middleware
-app.use(middleware.cors);
-app.use(middleware.handleError);
+// Set the port
+const port = process.env.PORT || 3000
 
-// Routes
-app.get('/', api.handleRoot);
-app.get('/products', api.listProducts);
-app.get('/products/:id', api.getProduct);
-app.post('/products', api.createProduct);
-app.put('/products/:id', api.updateProduct);
-app.delete('/products/:id', api.deleteProduct);
+// Boot the app
+const app = express()
 
-// 404 Not Found
-app.use(middleware.notFound);
+// Register the public directory
+app.use(express.static(__dirname + '/public'));
 
-// Start server
-const PORT = 3000;
-app.listen(PORT, () => {
-  console.log(`Server running on http://localhost:${PORT}`);
-});
+// register the routes
+app.use(bodyParser.json())
+app.use(middleware.cors)
 
-/**
- * Handle the root route
- * @param {object} req
- * @param {object} res
-*/
-function handleRoot(req, res) {
-  res.sendFile(path.join(__dirname, '/index.html'));
-}
+// Register root route
+app.get('/', api.handleRoot)
 
-/**
- * List all products
- * @param {object} req
- * @param {object} res
- */
-async function listProducts(req, res) {
-  const productsFile = path.join(__dirname, 'data/full-products.json')
-  try {
-    const data = await fs.readFile(productsFile)
-    res.json(JSON.parse(data))
-  } catch (err) {
-    res.status(500).json({ error: err.message })
-  }
-}
+// Register Products routes
+app.get('/products', api.listProducts)
+app.get('/products/:id', api.getProduct)
+app.put('/products/:id', api.editProduct)
+app.delete('/products/:id', api.deleteProduct)
+app.post('/products', api.createProduct)
+
+// Boot the server
+app.listen(port, () => console.log(`Server listening on port ${port}`))

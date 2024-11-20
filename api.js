@@ -1,69 +1,85 @@
-const path = require('path');
-const fs = require('fs').promises;
-const Products = require('./products');
+const path = require('path')
+const Products = require('./products')
+const autoCatch = require('./lib/auto-catch')
 
-// Handle the root route
+/**
+ * Handle the root route
+ * @param {object} req
+ * @param {object} res
+*/
 function handleRoot(req, res) {
   res.sendFile(path.join(__dirname, '/index.html'));
 }
 
-// List all products
+/**
+ * List all products
+ * @param {object} req
+ * @param {object} res
+ */
 async function listProducts(req, res) {
-  const { offset = 0, limit = 25, tag } = req.query;
-  
-  try {
-    const products = await Products.list({
-      offset: Number(offset),
-      limit: Number(limit),
-      tag
-    });
-    res.json(products);
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
+  // Extract the limit and offset query parameters
+  const { offset = 0, limit = 25, tag } = req.query
+  // Pass the limit and offset to the Products service
+  res.json(await Products.list({
+    offset: Number(offset),
+    limit: Number(limit),
+    tag
+  }))
 }
 
-// Fetch a single product by id
+
+/**
+ * Get a single product
+ * @param {object} req
+ * @param {object} res
+ */
 async function getProduct(req, res, next) {
-  const { id } = req.params;
-  
-  try {
-    const product = await Products.get(id);
-    if (!product) {
-      return next();
-    }
+  const { id } = req.params
 
-    return res.json(product);
-  } catch (err) {
-    res.status(500).json({ error: err.message });
+  const product = await Products.get(id)
+  if (!product) {
+    return next()
   }
+
+  return res.json(product)
 }
 
-// Create a product (Placeholder for now)
+/**
+ * Create a product
+ * @param {object} req 
+ * @param {object} res 
+ */
 async function createProduct(req, res) {
-    console.log('Request Body:', req.body);
-    res.json(req.body);  // Placeholder logic for now
-}  
+  console.log('request body:', req.body)
+  res.json(req.body)
+}
 
-// Update a product
-async function updateProduct(req, res) {
-    const { id } = req.params;
-    console.log(`Updating product with ID: ${id}`, req.body);
-    res.status(200).json({ message: 'Product updated successfully' });
-}  
+/**
+ * Edit a product
+ * @param {object} req
+ * @param {object} res
+ * @param {function} next
+ */
+async function editProduct(req, res, next) {
+  console.log(req.body)
+  res.json(req.body)
+}
 
-// Delete a product
-async function deleteProduct(req, res) {
-    const { id } = req.params;
-    console.log(`Deleting product with ID: ${id}`);
-    res.status(202).json({ message: 'Product deleted successfully' });
-}  
+/**
+ * Delete a product
+ * @param {*} req 
+ * @param {*} res 
+ * @param {*} next 
+ */
+async function deleteProduct(req, res, next) {
+  res.json({ success: true })
+}
 
-module.exports = {
+module.exports = autoCatch({
   handleRoot,
   listProducts,
   getProduct,
   createProduct,
-  updateProduct,
-  deleteProduct,
-};
+  editProduct,
+  deleteProduct
+});
