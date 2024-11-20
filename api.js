@@ -12,6 +12,7 @@ function handleRoot (req, res) {
   res.sendFile(path.join(__dirname, '/index.html'));
 }
 
+
 /**
  * List all products
  * @param {object} req
