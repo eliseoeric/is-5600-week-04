@@ -18,13 +18,38 @@ function handleRoot (req, res) {
  * @param {object} req
  * @param {object} res
  */
-async function listProducts (req, res,next) {
+async function listProducts (req, res) {
   // Add CORS headers
   res.setHeader('Access-Control-Allow-Origin', '*')
-  const { id } = req.params
+
 
   // Extract the limit and offset query parameters
   const { offset = 0, limit = 25 , tag} = req.query
+
+try {
+    // Pass the limit and offset to the Products service
+    res.json(await Products.list({
+      offset: Number(offset),
+      limit: Number(limit)
+    }))
+  } catch (err) {
+    res.status(500).json({ error: err.message })
+  }
+}
+
+// api.js
+
+
+/**
+ * Get a single product
+ * @param {object} req
+ * @param {object} res
+ */
+async function getProduct (req, res, next) {
+  // Add CORS headers
+  res.setHeader('Access-Control-Allow-Origin', '*')
+
+  const { id } = req.params
 
   try {
     const product = await Products.get(id)
@@ -38,7 +63,6 @@ async function listProducts (req, res,next) {
     res.status(500).json({ error: err.message })
   }
 }
-  
 
 module.exports = {
   handleRoot,
