@@ -14,8 +14,15 @@ module.exports = {
  * @returns {Promise<Array>}
  */
 async function list (options = {}) {
-  const { offset = 0, limit = 25 } = options
+  const { offset = 0, limit = 25 , tag } = options
   const data = await fs.readFile(productsFile)
 
-  return JSON.parse(data).slice(offset, offset + limit) // Slice the products
+  return JSON.parse(data)
+    .filter(product => {
+        if(!tag) {
+          return product
+        }
+          return product.tags.find(( {title} ) => title == tag)
+    })
+    .slice(offset, offset + limit) // Slice the products
 }
