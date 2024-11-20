@@ -2,6 +2,7 @@
 const express = require('express')
 const api = require('./api')
 const middleware = require('middleware')
+const bodyParser = require('body-parser')
 
 
 // Set the port
@@ -13,9 +14,13 @@ app.use(express.static(__dirname + '/public'));
 
 
 app.use(middleware.cors)
+app.use(bodyParser.json())
+
 app.get('/', api.handleRoot)
 app.get('/products', api.listProducts)
 app.get('/products/:id', api.getProduct)
+app.post('/products', api.createProduct)
+
 // Boot the server
 app.listen(port, () => console.log(`Server listening on port ${port}`))
 
