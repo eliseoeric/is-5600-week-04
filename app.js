@@ -20,8 +20,8 @@ app.get('/', api.handleRoot)
 app.get('/products', api.listProducts)
 app.get('/products/:id', api.getProduct)
 app.delete('/products', api.createProduct)
-app.delete('/products', api.deleteProduct)
-app.put('/products', api.updateProduct)
+app.delete('/products/:id', api.deleteProduct)
+app.put('/products/:id', api.updateProduct)
 
 // Boot the server
 app.listen(port, () => console.log(`Server listening on port ${port}`))
