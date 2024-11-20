@@ -65,6 +65,16 @@ async function getProduct (req, res, next) {
   }
 }
 
+// api.js
+/**
+ * Create a new product
+ * @param {object} req
+ * @param {object} res
+ */
+async function createProduct (req, res) {
+  console.log('request body:', req.body)
+  res.json(req.body)
+}
 module.exports = autoCatch({
   handleRoot,
   listProducts,
