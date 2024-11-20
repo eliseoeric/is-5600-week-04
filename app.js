@@ -1,5 +1,4 @@
-const fs = require('fs').promises
-const path = require('path')
+
 const express = require('express')
 const api = require('./api')
 
@@ -14,7 +13,7 @@ app.use(express.static(__dirname + '/public'));
 app.get('/products', api.listProducts)
 
 app.get('/', api.handleRoot)
-
+app.get('/products/:id', api.getProduct)
 // Boot the server
 app.listen(port, () => console.log(`Server listening on port ${port}`))
 
