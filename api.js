@@ -43,20 +43,17 @@ async function createProduct (req, res) {
     console.log('request body', req.body)
     res.json(req.body)
 }
-async function deleteProduct(req, res) {
-    const { id } = req.params;
-    console.log(`Delete request for product ID: ${id}`);
-    // Simulating product deletion logic
-    res.status(202).json({ message: `Product with ID ${id} deleted successfully` });
-}
-
-async function updateProduct(req, res) {
-    const { id } = req.params;
-    const updatedData = req.body;
-    console.log(`Update request for product ID: ${id} with data:`, updatedData);
-    // Simulating product update logic
-    res.status(200).json({ message: `Product with ID ${id} updated successfully`, updatedData });
-}
+async function updateProduct (req, res, next) {
+    const change = req.body
+    const product = await Products.edit(req.params.id, change)
+    res.json(product)
+  }
+  
+  
+  async function deleteProduct (req, res, next) {
+    const response = await Products.destroy(req.params.id)
+    res.json(response)
+  }
   module.exports = autoCatch({
     handleRoot,
     listProducts,
