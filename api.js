@@ -37,6 +37,30 @@ async function updateProduct(req, res) {
   res.status(200).json({ message: `Product with ID: ${id} has been updated.` });
 }
 
+
+/**
+ * Update a product
+ * @param {Request} req
+ * @param {Response} res
+ * @param {NextFunction} next
+ */
+async function editProduct (req, res, next) {
+  const change = req.body
+  const product = await Products.edit(req.params.id, change)
+  res.json(product)
+}
+
+/**
+ * Delete a product
+ * @param {Request} req
+ * @param {Response} res
+ * @param {NextFunction} next
+ */
+async function deleteProduct (req, res, next) {
+  const response = await Products.destroy(req.params.id)
+  res.json(response)
+}
+
 // Exporting all route handlers
 module.exports = autoCatch({
   handleRoot,
