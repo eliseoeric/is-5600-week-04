@@ -1,39 +1,69 @@
-const fs = require('fs').promises
-const path = require('path')
-const express = require('express')
+const express = require('express');
+const bodyParser = require('body-parser');
+const api = require('./api');
+const middleware = require('./middleware');
+const path = require('path');
 
-// Set the port
-const port = process.env.PORT || 3000
-// Boot the app
-const app = express()
-// Register the public directory
-app.use(express.static(__dirname + '/public'));
-// register the routes
-app.get('/products', listProducts)
-app.get('/', handleRoot);
-// Boot the server
-app.listen(port, () => console.log(`Server listening on port ${port}`))
+const app = express();
+const port = 3000;
+// app.js
 
-/**
- * Handle the root route
- * @param {object} req
- * @param {object} res
-*/
-function handleRoot(req, res) {
-  res.sendFile(path.join(__dirname, '/index.html'));
-}
+// ...
+
+app.get('/orders', api.listOrders)
+app.get('/orders/', api.createOrder)
+// Middleware
+app.use(middleware.cors);        // Enable CORS for all routes
+app.use(bodyParser.json());      // Parse incoming JSON bodies
+// api.js
 
 /**
- * List all products
- * @param {object} req
- * @param {object} res
+ * Create an order
+ * @param {Request} req
+ * @param {Response} res
+ * @param {NextFunction} next
  */
-async function listProducts(req, res) {
-  const productsFile = path.join(__dirname, 'data/full-products.json')
-  try {
-    const data = await fs.readFile(productsFile)
-    res.json(JSON.parse(data))
-  } catch (err) {
-    res.status(500).json({ error: err.message })
-  }
+async function createOrder (req, res, next) {
+  const order = await Orders.create(req.body)
+  res.json(orders)
 }
+
+/**
+ * List orders
+ * @param {Request} req
+ * @param {Response} res
+ * @param {NextFunction} next
+ */
+async function listOrders (req, res, next) {
+  const { offset = 0, limit = 25, productId, status } = req.query
+
+  const orders = await Orders.list({ 
+    offset: Number(offset), 
+    limit: Number(limit),
+    productId, 
+    status 
+  })
+
+  res.json(orders)
+}
+// Routes
+app.get('/', api.handleRoot);    // Route for serving the root HTML page
+app.get('/products', api.listProducts);  // Route to get all products
+app.get('/products/:id', api.getProduct); // Route to get a single product by ID
+app.post('/products', api.createProduct); // Route to create a new product
+app.put('/products/:id', api.updateProduct); // Route to update a product
+app.delete('/products/:id', api.deleteProduct); // Route to delete a product
+
+// Error handling middleware
+app.use(middleware.handleError); // Handles server errors
+app.use(middleware.notFound);     // Handles 404 errors if no route matches
+
+// Start server
+app.listen(port, () => {
+  console.log(`Server is running on port ${port}`);
+});
+// app.js
+
+// Register routes for orders
+app.put('/orders/:id', api.editOrder); // Update an order
+app.delete('/orders/:id', api.deleteOrder); // Delete an order
