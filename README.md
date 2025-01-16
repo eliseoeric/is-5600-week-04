@@ -1,22 +1,9 @@
-# Lab 04 | Fullstack Prints Part 1
 
-## Table of Contents
-
-1. [Lab 04 | Fullstack Prints Part 1](#lab-04--Fullstack Prints Part 1)
-   - [Overview](#overview)
-   - [Instructions](#instructions)
-2. [Guidance and Testing](#guidance-and-testing)
-3. [Submission](#submission)
-4. [Getting Started with GitHub and Codespaces](#getting-started-with-github-and-codespaces)
-   - [Step 1: Fork the Repository](#step-1-fork-the-repository)
-   - [Step 2: Open the Repository in Codespaces](#step-2-open-the-repository-in-codespaces)
-   - [Step 3: Complete the Lab Assignment](#step-3-complete-the-lab-assignment)
-   - [Step 4: Submit Your Work via Pull Request](#step-4-submit-your-work-via-pull-request)
 
 
 ## Overview
 
-In this lab, we will be building a simple eCommerce server. We will be using Node.js and Express to build our server. We will use this as the basis for our future labs. This eCommerce server will be pretty basic. It will:
+ building a simple eCommerce server. We will be using Node.js and Express to build our server. We will use this as the basis for our future labs. This eCommerce server will be pretty basic. It will:
 
 - provide a list of all products
 - allow for filtering and pagination of products
