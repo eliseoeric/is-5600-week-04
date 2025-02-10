@@ -221,7 +221,7 @@ async function getProduct (req, res, next) {
   // Add CORS headers
   res.setHeader('Access-Control-Allow-Origin', '*')
 
-  const { id } = req.params
+  const { id } = req.params;
 
   try {
     const product = await Products.get(id)
