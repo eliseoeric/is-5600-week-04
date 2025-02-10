@@ -1,7 +1,6 @@
-const fs = require('fs').promises
 const path = require('path')
 const Products = require('./products')
-const autoCatch = require('lib/auto-catch')
+const autoCatch = require('./lib/auto-catch')
 
 /**
  * Handle the root route

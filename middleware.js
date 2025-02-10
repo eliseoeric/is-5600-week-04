@@ -10,7 +10,7 @@ function cors (req, res, next) {
   
     // Set the CORS headers
     res.setHeader('Access-Control-Allow-Origin', origin || '*')
-    res.setHeader('Access-Control-Allow-Methods', 'POST, GET, PUT, DELETE, OPTIONS, MODIFY')
+    res.setHeader('Access-Control-Allow-Methods', 'POST, GET, PUT, DELETE, OPTIONS, XMODIFY')
     res.setHeader('Access-Control-Allow-Credentials', true)
     res.setHeader('Access-Control-Max-Age', '86400')
     res.setHeader('Access-Control-Allow-Headers', 'X-Requested-With, X-HTTP-Method-Override, Content-Type, Accept')
@@ -18,7 +18,7 @@ function cors (req, res, next) {
     next()
   }
 
-  function handleError (err, req, res, next) {
+function handleError (err, req, res, next) {
     console.error(err)
     
     if (res.headersSent) {
@@ -26,15 +26,15 @@ function cors (req, res, next) {
     }
   
     res.status(500).json({ error: "Internal Error Occurred" })
-  }
+}
   
-  function notFound (req, res) {
+function notFound (req, res) {
     res.status(404).json({ error: "Not Found" })
   }
 
-  module.exports = {
+module.exports = {
     cors,
     handleError,
     notFound,
     
-  }
+}
