@@ -34,9 +34,50 @@ async function list (options = {}) {
      // If no product is found, return null
     return null;
   }
-    
+
+/**
+ * Delete a single product (simulation)
+ * @param {string} id
+ * @returns {Promise<boolean>}
+ */
+async function deleteProduct(id) {
+    const products = JSON.parse(await fs.readFile(productsFile));  // Read products data from file
+  
+    const index = products.findIndex(product => product.id === id);  // Find the product by id
+    if (index !== -1) {
+      products.splice(index, 1);  // Remove the product from the array
+      console.log(`Product with id ${id} deleted (simulation).`);  // Log the deletion
+      return true;  // Simulate deletion
+    }
+  
+    return false;  // Return false if product is not found
+  }
+
+  /**
+ * Update a single product (simulation)
+ * @param {string} id
+ * @param {object} updatedProduct
+ * @returns {Promise<boolean>}
+ */
+async function update(id, updatedProduct) {
+    const products = JSON.parse(await fs.readFile(productsFile));  // Read products data from file
+  
+    const index = products.findIndex(product => product.id === id);  // Find the product by id
+    if (index !== -1) {
+      // Simulate updating the product by replacing it with the updated data
+      products[index] = { ...products[index], ...updatedProduct };
+      console.log(`Product with id ${id} updated (simulation).`);  // Log the update
+      return true;  // Simulate successful update
+    }
+  
+    return false;  // Return false if product is not found
+  }
+
 
 module.exports = {
     list,
-    get
-  }
+    get,
+    update,
+    deleteProduct
+};
+    

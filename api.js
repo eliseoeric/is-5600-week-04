@@ -50,9 +50,51 @@ function handleRoot(req, res) {
     res.json(req.body)
   }
 
+  async function deleteProduct(req, res, next) {
+    const { id } = req.params;  // Extract the 'id' from the URL params
+  
+    try {
+      const result = await Products.delete(id);  // Call the delete method in Products service
+  
+      if (result) {
+        console.log(`Product with id ${id} was deleted.`);
+        return res.status(202).json({ message: `Product with id ${id} was deleted.` });
+      } else {
+        return next();  // If the product is not found, pass control to 404 handler
+      }
+    } catch (err) {
+      res.status(500).json({ error: err.message });  // Handle any errors
+    }
+  }
+
+/**
+ * Update a single product
+ * @param {object} req
+ * @param {object} res
+ */
+async function updateProduct(req, res, next) {
+    const { id } = req.params;  // Extract the 'id' from the URL params
+    const updatedProduct = req.body;  // Get the updated product data from the request body
+  
+    try {
+      const result = await Products.update(id, updatedProduct);  // Call the update method in Products service
+  
+      if (result) {
+        console.log(`Product with id ${id} was updated.`);
+        return res.status(200).json({ message: `Product with id ${id} was updated.` });
+      } else {
+        return next();  // If the product is not found, pass control to 404 handler
+      }
+    } catch (err) {
+      res.status(500).json({ error: err.message });  // Handle any errors
+    }
+  }
+
   module.exports = autoCatch({
     handleRoot,
     listProducts,
     getProduct,
     createProduct,
+    deleteProduct,
+    updateProduct,
   });
