@@ -37,3 +37,56 @@ async function listProducts(req, res) {
     res.status(500).json({ error: err.message })
   }
 }
+// app.js
+// Add the api module
+const api = require('./api')
+
+// update the route handlers
+app.get('/', api.handleRoot)
+app.get('/products', api.listProducts)
+// app.js
+
+// ...
+
+app.get('/products/:id', api.getProduct)
+// app.js
+// Require the middleware module
+const middleware = require('middleware')
+
+// Register our upcoming middleware
+app.use(middleware.cors)
+app.get('/', api.handleRoot)
+app.get('/products', api.listProducts)
+app.get('/products/:id', api.getProduct)
+// app.js
+// Add body parser middleware
+const bodyParser = require('body-parser')
+
+// ...
+app.use(middleware.cors)
+app.use(bodyParser.json())
+
+//...
+app.post('/products', api.createProduct)
+const express = require('express');
+const bodyParser = require('body-parser');
+const api = require('./api');
+const middleware = require('./middleware');
+
+// Set up the app
+const app = express();
+const port = process.env.PORT || 3000;
+
+// Middleware
+app.use(middleware.cors);
+app.use(bodyParser.json());
+
+// Register the routes
+app.get('/', api.handleRoot);
+app.get('/products', api.listProducts);
+app.get('/products/:id', api.getProduct);
+app.delete('/products/:id', api.deleteProduct);  // DELETE route
+app.put('/products/:id', api.updateProduct);    // PUT route
+
+// Boot the server
+app.listen(port, () => console.log(`Server listening on port ${port}`));
