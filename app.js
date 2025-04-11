@@ -37,3 +37,10 @@ async function listProducts(req, res) {
     res.status(500).json({ error: err.message })
   }
 }
+// app.js
+// Add the api module
+const api = require('./api')
+
+// update the route handlers
+app.get('/', api.handleRoot)
+app.get('/products', api.listProducts)
