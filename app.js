@@ -1,6 +1,11 @@
 const fs = require('fs').promises
 const path = require('path')
 const express = require('express')
+const path = require('path');
+const express = require('express');
+const bodyParser = require('body-parser');
+const api = require('./api');
+const middleware = require('./middleware');
 
 // Set the port
 const port = process.env.PORT || 3000
@@ -13,6 +18,8 @@ app.get('/products', listProducts)
 app.get('/', handleRoot);
 // Boot the server
 app.listen(port, () => console.log(`Server listening on port ${port}`))
+const port = process.env.PORT || 3000;
+const app = express();
 
 /**
  * Handle the root route
@@ -22,6 +29,10 @@ app.listen(port, () => console.log(`Server listening on port ${port}`))
 function handleRoot(req, res) {
   res.sendFile(path.join(__dirname, '/index.html'));
 }
+// Middleware
+app.use(bodyParser.json());
+app.use(express.static(path.join(__dirname, 'public'))); // Serve static files like index.js, nanohtml.js
+app.use(middleware.cors);
 
 /**
  * List all products
@@ -36,4 +47,18 @@ async function listProducts(req, res) {
   } catch (err) {
     res.status(500).json({ error: err.message })
   }
-}
+} 
+// Routes
+app.get('/', api.handleRoot);
+app.get('/products', api.listProducts);
+app.get('/products/:id', api.getProduct);
+app.post('/products', api.createProduct);
+app.put('/products/:id', api.updateProduct);
+app.delete('/products/:id', api.deleteProduct);
+
+// Error handling middleware
+app.use(middleware.notFound);
+app.use(middleware.handleError);
+
+// Start server
+app.listen(port, () => console.log(`Server running on port ${port}`));
