@@ -1,6 +1,9 @@
 const fs = require('fs').promises
 const path = require('path')
 const express = require('express')
+const api = require('./api')
+const middleware = require('./middleware')
+const bodyParser = require('body-parser')
 
 // Set the port
 const port = process.env.PORT || 3000
@@ -11,6 +14,14 @@ app.use(express.static(__dirname + '/public'));
 // register the routes
 app.get('/products', listProducts)
 app.get('/', handleRoot);
+app.use(bodyParser.json())
+app.use(middleware.cors)
+app.get('/', api.handleRoot)
+app.get('/products', api.listProducts)
+app.get('/products/:id', api.getProduct)
+app.put('/products/:id', api.editProduct)
+app.delete('/products/:id', api.deleteProduct)
+app.post('/products', api.createProduct)
 // Boot the server
 app.listen(port, () => console.log(`Server listening on port ${port}`))
 
@@ -37,3 +48,5 @@ async function listProducts(req, res) {
     res.status(500).json({ error: err.message })
   }
 }
+
+app.listen(port, () => console.log(`Server listening on port ${port}`))
