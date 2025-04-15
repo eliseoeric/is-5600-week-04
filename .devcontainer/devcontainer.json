@@ -1,31 +1,22 @@
 {
   "name": "IS 5600 - Lab 4",
   "image": "mcr.microsoft.com/devcontainers/universal:2",
+  "image": "mcr.microsoft.com/devcontainer/universal:2",
   "hostRequirements": {
     "cpus": 4
   },
-  "waitFor": "onCreateCommand",
-  "updateContentCommand": "npm install",
-  "postCreateCommand": "",
-  "postAttachCommand": {
-    "server": "npm start"
+@@ -12,7 +12,7 @@
   },
   // Configure tool-specific properties.
   "customizations": {
     "codespaces": {
+    "codeSpaces": {
       "openFiles": ["app.js"]
     },
     // Configure properties specific to VS Code.
-    "vscode": {
-      "settings": {},
-      "extensions": ["streetsidesoftware.code-spell-checker"]
-    }
-  },
-  "portsAttributes": {
-    "3000": {
-      "label": "Application",
-      "onAutoForward": "openPreview"
-    }
+@@ -29,3 +29,5 @@
   },
   "forwardPorts": [3000]
 }
+// cSpell:ignore codespaces
+
