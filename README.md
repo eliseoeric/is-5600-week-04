@@ -190,7 +190,6 @@ Review this in the browser, you should be able to visit `/products?limit=1&offse
 
 6. Modern web APIs typically allow for filtering of data as well. Let's add a `tag` query parameter to our endpoint, so we can filter out specific products. For example, if we wanted to filter out all products that have the tag `electronics`, we would use the following query: `?tag=electronics`. On your own, update the `api.js` and `products.js` files to handle this query parameter. You can use the `limit` and `offset` query parameters as a reference. You should use `Array.filter` in the `Products.list()` method to filter the products based on the tag.
 
-7. Next, let's add the ability to fetch a single product. The route should look something like `/products/oZPSX_mQ3xI`. First let's add the route to the `app.js` file. We will use the `:id` parameter to capture the product id. We will then pass this parameter to the `api.getProduct` method.
 
 ```js
 // app.js
@@ -291,7 +290,6 @@ function cors (req, res, next) {
 
   // Set the CORS headers
   res.setHeader('Access-Control-Allow-Origin', origin || '*')
-  res.setHeader('Access-Control-Allow-Methods', 'POST, GET, PUT, DELETE, OPTIONS, XMODIFY')
   res.setHeader('Access-Control-Allow-Credentials', true)
   res.setHeader('Access-Control-Max-Age', '86400')
   res.setHeader('Access-Control-Allow-Headers', 'X-Requested-With, X-HTTP-Method-Override, Content-Type, Accept')
