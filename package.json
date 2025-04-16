@@ -1,8 +1,54 @@
-{
+// filepath: /workspaces/is-5600-week-04/app.js
+const express = require('express');
+const { cors, handleError, notFound } = require('./public/middleware');
+
+const app = express();
+
+// Middleware
+app.use(cors);
+app.use(express.json());
+
+// Routes
+app.get('/', (req, res) => {
+    res.send('Hello, World!');
+});
+
+// Error handling
+app.use(notFound);
+app.use(handleError);
+
+// Start server
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+    console.log(`Server is running on port ${PORT}`);
+});// filepath: /workspaces/is-5600-week-04/app.js
+const express = require('express');
+const { cors, handleError, notFound } = require('./public/middleware');
+
+const app = express();
+
+// Middleware
+app.use(cors);
+app.use(express.json());
+
+// Routes
+app.get('/', (req, res) => {
+    res.send('Hello, World!');
+});
+
+// Error handling
+app.use(notFound);
+app.use(handleError);
+
+// Start server
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+    console.log(`Server is running on port ${PORT}`);
+});{
   "name": "nodejs",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "app.js",
   "scripts": {
     "start": "nodemon app.js",
     "test": "echo \"Error: no test specified\" && exit 1"
