@@ -1,0 +1,19 @@
+[
+  {
+    "id": 1,
+    "name": "Canvas Print",
+    "price": 29.99
+  },
+  {
+    "id": 2,
+    "name": "Poster",
+    "price": 9.99
+  },
+  {
+    "id": 3,
+    "name": "Framed Art",
+    "price": 49.99
+  }
+]
+
+

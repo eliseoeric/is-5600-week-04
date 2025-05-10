@@ -1,19 +1,16 @@
 {
   "name": "nodejs",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "description": "Fullstack Prints Part 1 backend",
+  "main": "app.js",
   "scripts": {
-    "start": "nodemon app.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "nodemon app.js"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@types/node": "^18.0.6",
     "express": "^4.21.1",
-    "node-fetch": "^3.2.6",
     "nodemon": "^3.1.0"
   }
 }

@@ -1,39 +1,21 @@
-const fs = require('fs').promises
-const path = require('path')
 const express = require('express')
-
-// Set the port
-const port = process.env.PORT || 3000
-// Boot the app
 const app = express()
-// Register the public directory
-app.use(express.static(__dirname + '/public'));
-// register the routes
-app.get('/products', listProducts)
-app.get('/', handleRoot);
-// Boot the server
-app.listen(port, () => console.log(`Server listening on port ${port}`))
+const api = require('./routes/api')
+const middleware = require('./middleware')
 
-/**
- * Handle the root route
- * @param {object} req
- * @param {object} res
-*/
-function handleRoot(req, res) {
-  res.sendFile(path.join(__dirname, '/index.html'));
-}
+// Apply CORS middleware
+app.use(middleware.cors)
 
-/**
- * List all products
- * @param {object} req
- * @param {object} res
- */
-async function listProducts(req, res) {
-  const productsFile = path.join(__dirname, 'data/full-products.json')
-  try {
-    const data = await fs.readFile(productsFile)
-    res.json(JSON.parse(data))
-  } catch (err) {
-    res.status(500).json({ error: err.message })
-  }
-}
+// Serve static files from the "public" directory
+app.use(express.static('public'))
+
+// Parse JSON request bodies
+app.use(express.json())
+
+// Mount API routes
+app.use('/api', api)
+
+// Global error handler
+app.use(middleware.handleError)
+
+module.exports = app
