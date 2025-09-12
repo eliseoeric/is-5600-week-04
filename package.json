@@ -4,16 +4,20 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "nodemon app.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node app.js",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "nodemon app.js"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
     "@types/node": "^18.0.6",
-    "express": "^4.21.1",
-    "node-fetch": "^3.2.6",
-    "nodemon": "^3.1.0"
+    "express": "^4.21.2",
+    "node-fetch": "^3.2.6"
+  },
+  "devDependencies": {
+    "nodeman": "^1.1.2",
+    "nodemon": "^3.1.10"
   }
 }
