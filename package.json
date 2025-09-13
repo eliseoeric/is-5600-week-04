@@ -1,19 +1,21 @@
 {
   "name": "nodejs",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "description": "Fullstack Prints Lab 04 backend",
+  "main": "app.js",
   "scripts": {
-    "start": "nodemon app.js",
+    "start": "node app.js",
+    "dev": "nodemon app.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@types/node": "^18.0.6",
-    "express": "^4.21.1",
-    "node-fetch": "^3.2.6",
+    "body-parser": "^1.20.2",
+    "express": "^4.21.1"
+  },
+  "devDependencies": {
     "nodemon": "^3.1.0"
   }
 }
