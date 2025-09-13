@@ -1,12 +1,116 @@
 <!DOCTYPE html>
-<html lang="en" dir="ltr">
-  <head>
-    <meta charset="utf-8">
-    <title>Fullstack Prints</title>
-    <link rel="stylesheet" href="https://unpkg.com/tachyons@4.10.0/css/tachyons.min.css"/>
-  </head>
-  <body class="w-100 sans-serif bg-white">
-    <script src='/nanohtml.js'></script>
-    <script src='/index.js'></script>
-  </body>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Stylish Prints Store</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: linear-gradient(to right, #f8fbff, #eaf3ff);
+      margin: 0;
+      padding: 20px;
+    }
+    h1 {
+      text-align: center;
+      color: #1565c0;
+    }
+    #products {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 20px;
+      margin-top: 20px;
+    }
+    .card {
+      background: white;
+      padding: 15px;
+      border-radius: 8px;
+      box-shadow: 0px 2px 6px rgba(0,0,0,0.1);
+      transition: transform 0.2s;
+    }
+    .card:hover {
+      transform: translateY(-5px);
+    }
+    .card h2 {
+      margin: 0 0 10px;
+      color: #333;
+    }
+    .card p {
+      margin: 5px 0;
+      color: #555;
+    }
+    .pagination {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 20px;
+    }
+    button {
+      padding: 10px 20px;
+      border: none;
+      border-radius: 6px;
+      background: #1565c0;
+      color: white;
+      cursor: pointer;
+      font-size: 14px;
+    }
+    button:disabled {
+      background: #ccc;
+      cursor: not-allowed;
+    }
+  </style>
+</head>
+<body>
+  <h1>🛍️ Stylish Prints Store</h1>
+  <div id="products">Loading products...</div>
+  <div class="pagination">
+    <button id="prev">⬅ Previous</button>
+    <button id="next">Next ➡</button>
+  </div>
+
+  <script>
+    let offset = 0;
+    const limit = 4;
+
+    async function fetchProducts() {
+      try {
+        const res = await fetch(`/products?limit=${limit}&offset=${offset}`);
+        const products = await res.json();
+
+        const container = document.getElementById("products");
+        container.innerHTML = "";
+
+        if (!products || products.length === 0) {
+          container.innerHTML = "<p>No products found.</p>";
+          return;
+        }
+
+        products.forEach(p => {
+          const card = document.createElement("div");
+          card.className = "card";
+          card.innerHTML = `
+            <h2>${p.name}</h2>
+            <p><strong>Price:</strong> $${p.price}</p>
+            <p><strong>Tags:</strong> ${p.tags.join(", ")}</p>
+          `;
+          container.appendChild(card);
+        });
+      } catch (err) {
+        console.error("Error fetching products:", err);
+        document.getElementById("products").innerHTML = "<p style='color:red;'>Failed to load products.</p>";
+      }
+    }
+
+    document.getElementById("next").addEventListener("click", () => {
+      offset += limit;
+      fetchProducts();
+    });
+
+    document.getElementById("prev").addEventListener("click", () => {
+      if (offset >= limit) offset -= limit;
+      fetchProducts();
+    });
+
+    fetchProducts();
+  </script>
+</body>
 </html>
