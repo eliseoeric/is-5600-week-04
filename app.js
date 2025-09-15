@@ -1,39 +1,34 @@
-const fs = require('fs').promises
-const path = require('path')
 const express = require('express')
+const path = require('path')
+const bodyParser = require('body-parser')
+const api = require('./api')
+const middleware = require('./middleware')
 
-// Set the port
-const port = process.env.PORT || 3000
-// Boot the app
 const app = express()
-// Register the public directory
-app.use(express.static(__dirname + '/public'));
-// register the routes
-app.get('/products', listProducts)
-app.get('/', handleRoot);
-// Boot the server
-app.listen(port, () => console.log(`Server listening on port ${port}`))
+app.use(express.static(path.join(__dirname, 'public')))
+app.use(middleware.cors)
+app.use(bodyParser.json())
+app.get('/', api.handleRoot)
+app.get('/products', api.listProducts)
+app.get('/products/:id', api.getProduct)
+app.post('/products', api.createProduct)
+app.put('/products/:id', api.updateProduct)
+app.delete('/products/:id', api.deleteProduct)
+app.use(middleware.notFound)
+app.use(middleware.handleError)
 
-/**
- * Handle the root route
- * @param {object} req
- * @param {object} res
-*/
-function handleRoot(req, res) {
-  res.sendFile(path.join(__dirname, '/index.html'));
+function start(port) {
+  const server = app.listen(port, () => {
+    console.log(`Server listening on http://localhost:${port}`)
+  })
+  server.on('error', (err) => {
+    if (err.code === 'EADDRINUSE') {
+      const next = port + 1
+      console.log(`Port ${port} in use, trying ${next}...`)
+      start(next)
+    } else {
+      throw err
+    }
+  })
 }
-
-/**
- * List all products
- * @param {object} req
- * @param {object} res
- */
-async function listProducts(req, res) {
-  const productsFile = path.join(__dirname, 'data/full-products.json')
-  try {
-    const data = await fs.readFile(productsFile)
-    res.json(JSON.parse(data))
-  } catch (err) {
-    res.status(500).json({ error: err.message })
-  }
-}
+start(Number(process.env.PORT) || 3000)
