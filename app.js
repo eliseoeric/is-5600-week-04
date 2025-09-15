@@ -1,39 +1,51 @@
-const fs = require('fs').promises
-const path = require('path')
-const express = require('express')
+// app.js
+const express = require('express');
+const api = require('./api');
+const middleware = require('./middleware');
 
-// Set the port
-const port = process.env.PORT || 3000
-// Boot the app
-const app = express()
-// Register the public directory
+const PORT = Number(process.env.PORT) || 3000;
+
+const app = express();
+
+// Core middleware
+app.use(middleware.cors);
+app.use(express.json()); // replaces body-parser.json()
+
+// Static files
 app.use(express.static(__dirname + '/public'));
-// register the routes
-app.get('/products', listProducts)
-app.get('/', handleRoot);
-// Boot the server
-app.listen(port, () => console.log(`Server listening on port ${port}`))
 
-/**
- * Handle the root route
- * @param {object} req
- * @param {object} res
-*/
-function handleRoot(req, res) {
-  res.sendFile(path.join(__dirname, '/index.html'));
-}
+// Routes
+app.get('/', api.handleRoot);
+app.get('/products', api.listProducts);
+app.get('/products/:id', api.getProduct);
 
-/**
- * List all products
- * @param {object} req
- * @param {object} res
- */
-async function listProducts(req, res) {
-  const productsFile = path.join(__dirname, 'data/full-products.json')
-  try {
-    const data = await fs.readFile(productsFile)
-    res.json(JSON.parse(data))
-  } catch (err) {
-    res.status(500).json({ error: err.message })
+// 404 then error handler (order matters)
+app.use(middleware.notFound);
+app.use(middleware.handleError);
+
+// Start server
+const server = app.listen(PORT, () => {
+  console.log(`🚀 Server listening on port ${PORT}`);
+});
+
+// Helpful errors (e.g., port already in use)
+server.on('error', (err) => {
+  if (err.code === 'EADDRINUSE') {
+    console.error(`❌ Port ${PORT} is already in use. Pick another port:`);
+    console.error(`   ▶ Try: PORT=${PORT + 1} npm start`);
+  } else {
+    console.error('Server error:', err);
   }
-}
+  process.exit(1);
+});
+
+// Graceful shutdown: frees the port on Ctrl+C / container stop
+const shutdown = (sig) => {
+  console.log(`\n${sig} received. Shutting down...`);
+  server.close(() => {
+    console.log('✅ Server closed. Bye!');
+    process.exit(0);
+  });
+};
+process.on('SIGINT', () => shutdown('SIGINT'));
+process.on('SIGTERM', () => shutdown('SIGTERM'));
