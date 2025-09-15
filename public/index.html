@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>eCommerce App</title>
+</head>
+<body>
+  <h1>Available Products</h1>
+  <ul id="product-list"></ul>
+
+  <h2>Create New Product</h2>
+  <form id="create-form">
+    <input type="text" placeholder="Product ID" name="id" required>
+    <input type="text" placeholder="Product Name" name="name" required>
+    <input type="text" placeholder="Description" name="description">
+    <input type="text" placeholder="Image URL" name="url">
+    <button type="submit">Create Product</button>
+  </form>
+
+  <script>
+  async function loadProducts() {
+    const res = await fetch('/products');
+    const products = await res.json();
+    const ul = document.getElementById('product-list');
+    ul.innerHTML = '';
+    products.forEach(product => {
+      const li = document.createElement('li');
+      li.innerHTML = `
+        <strong>${product.name}</strong>
+        <br>ID: ${product.id}
+        <br>${product.description}
+        <br><img src="${product.urls?.small}" alt="${product.name}">
+        <br>
+        <button onclick="deleteProduct('${product.id}')">Delete</button>
+        <button onclick="updateProduct('${product.id}')">Update</button>
+        <hr>
+      `;
+      ul.appendChild(li);
+    });
+  }
+
+  async function deleteProduct(id) {
+    await fetch(`/products/${id}`, { method: 'DELETE' });
+    loadProducts();
+  }
+
+  async function updateProduct(id) {
+    const newDesc = prompt("Enter new description:");
+    if (!newDesc) return;
+    await fetch(`/products/${id}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ description: newDesc })
+    });
+    loadProducts();
+  }
+
+  document.getElementById('create-form').onsubmit = async function(e) {
+    e.preventDefault();
+    const f = new FormData(e.target);
+    const product = {
+      id: f.get('id'),
+      name: f.get('name'),
+      description: f.get('description'),
+      urls: { small: f.get('url') || 'https://via.placeholder.com/150' }
+    };
+    await fetch('/products', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(product)
+    });
+    loadProducts();
+    e.target.reset();
+  };
+
+  loadProducts();
+  </script>
+</body>
+</html>
