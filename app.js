@@ -1,39 +1,32 @@
-const fs = require('fs').promises
-const path = require('path')
-const express = require('express')
+const fs = require('fs').promises;      // professor had these at top; harmless to keep
+const path = require('path');
+const express = require('express');
+const bodyParser = require('body-parser');
 
-// Set the port
-const port = process.env.PORT || 3000
-// Boot the app
-const app = express()
-// Register the public directory
-app.use(express.static(__dirname + '/public'));
-// register the routes
-app.get('/products', listProducts)
-app.get('/', handleRoot);
+const api = require('./api');           // our modular routes
+const middleware = require('./middleware');
+
+const port = process.env.PORT || 3000;
+const app = express();
+
+// Serve ONLY /public as static (matches professor directions)
+app.use(express.static(path.join(__dirname, 'public')));
+
+// Global middleware
+app.use(middleware.cors);
+app.use(bodyParser.json());
+
+// Routes (professor + additions)
+app.get('/', api.handleRoot);                 // root -> index.html at repo root
+app.get('/products', api.listProducts);       // list w/ limit, offset, tag
+app.get('/products/:id', api.getProduct);     // single
+app.post('/products', api.createProduct);     // create (stub)
+app.put('/products/:id', api.updateProduct);  // update (stub)
+app.delete('/products/:id', api.deleteProduct);// delete (stub)
+
+// 404 + error
+app.use(middleware.notFound);
+app.use(middleware.handleError);
+
 // Boot the server
-app.listen(port, () => console.log(`Server listening on port ${port}`))
-
-/**
- * Handle the root route
- * @param {object} req
- * @param {object} res
-*/
-function handleRoot(req, res) {
-  res.sendFile(path.join(__dirname, '/index.html'));
-}
-
-/**
- * List all products
- * @param {object} req
- * @param {object} res
- */
-async function listProducts(req, res) {
-  const productsFile = path.join(__dirname, 'data/full-products.json')
-  try {
-    const data = await fs.readFile(productsFile)
-    res.json(JSON.parse(data))
-  } catch (err) {
-    res.status(500).json({ error: err.message })
-  }
-}
+app.listen(port, () => console.log(`Server listening on port ${port}`));
