@@ -1,39 +1,50 @@
-const fs = require('fs').promises
-const path = require('path')
-const express = require('express')
+// Importing required modules
+const fs = require('fs').promises // for file operations (async)
+const path = require('path')      // for handling file paths
+const express = require('express') // web framework
 
-// Set the port
+// Set the port number
 const port = process.env.PORT || 3000
-// Boot the app
+
+// Create express app
 const app = express()
-// Register the public directory
-app.use(express.static(__dirname + '/public'));
-// register the routes
-app.get('/products', listProducts)
-app.get('/', handleRoot);
-// Boot the server
+
+// Serve static files from 'public' folder
+app.use(express.static(__dirname + '/public'))
+
+// Routes
+app.get('/products', listProducts) // API endpoint to get products
+app.get('/', handleRoot)           // route for home page
+
+// Start server
 app.listen(port, () => console.log(`Server listening on port ${port}`))
 
-/**
- * Handle the root route
- * @param {object} req
- * @param {object} res
-*/
+// Handle root route -> send index.html file
 function handleRoot(req, res) {
-  res.sendFile(path.join(__dirname, '/index.html'));
+  // send the homepage
+  res.sendFile(path.join(__dirname, '/index.html'))
 }
 
-/**
- * List all products
- * @param {object} req
- * @param {object} res
- */
+// Function to list products with pagination
 async function listProducts(req, res) {
-  const productsFile = path.join(__dirname, 'data/full-products.json')
+  const productsFile = path.join(__dirname, 'data/full-products.json') // path to JSON file
+
+  // Get query params for pagination, default offset=0, limit=20
+  const offset = parseInt(req.query.offset || 0)
+  const limit = parseInt(req.query.limit || 20)
+
   try {
+    // read the JSON file
     const data = await fs.readFile(productsFile)
-    res.json(JSON.parse(data))
+    const allProducts = JSON.parse(data) // parse JSON data
+
+    // slice array according to offset and limit
+    const paginated = allProducts.slice(offset, offset + limit)
+
+    // send paginated products as JSON response
+    res.json(paginated)
   } catch (err) {
+    // if any error occurs, send 500 with error message
     res.status(500).json({ error: err.message })
   }
 }
