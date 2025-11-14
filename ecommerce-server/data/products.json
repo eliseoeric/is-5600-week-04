@@ -1,0 +1,5 @@
+[
+  { "id": 1, "name": "Running Shoes", "price": 79.99, "category": "shoes", "description": "Comfortable running shoes" },
+  { "id": 2, "name": "T-shirt", "price": 19.99, "category": "apparel", "description": "100% cotton tee" },
+  { "id": 3, "name": "Coffee Mug", "price": 9.99, "category": "home", "description": "Ceramic mug" }
+]
