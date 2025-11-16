@@ -1,12 +1,30 @@
 <!DOCTYPE html>
-<html lang="en" dir="ltr">
-  <head>
-    <meta charset="utf-8">
-    <title>Fullstack Prints</title>
-    <link rel="stylesheet" href="https://unpkg.com/tachyons@4.10.0/css/tachyons.min.css"/>
-  </head>
-  <body class="w-100 sans-serif bg-white">
-    <script src='/nanohtml.js'></script>
-    <script src='/index.js'></script>
-  </body>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>E-Commerce Products</title>
+  <link rel="stylesheet" href="https://unpkg.com/tachyons@4.10.0/css/tachyons.min.css"/>
+</head>
+
+<body class="sans-serif pa4">
+  <h1 class="tc">E-Commerce Products</h1>
+
+  <section class="pa3">
+    <h3>Filter Products</h3>
+
+    Category: <input id="filter-category" type="text" />
+    Min Price: <input id="filter-min" type="number" />
+    Max Price: <input id="filter-max" type="number" />
+    <button id="filter-btn">Apply Filter</button>
+  </section>
+
+  <div id="products" class="pa2"></div>
+
+  <div class="tc pa3">
+    <button id="prev-btn">Previous</button>
+    <button id="next-btn">Next</button>
+  </div>
+
+  <script src="/index.js"></script>
+</body>
 </html>
