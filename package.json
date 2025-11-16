@@ -1,10 +1,11 @@
 {
   "name": "nodejs",
   "version": "1.0.0",
-  "description": "",
+  "description": "Simple backend server for eCommerce lab",
   "main": "index.js",
   "scripts": {
-    "start": "nodemon app.js",
+    "start": "node index.js",
+    "dev": "nodemon index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
@@ -12,8 +13,11 @@
   "license": "ISC",
   "dependencies": {
     "@types/node": "^18.0.6",
-    "express": "^4.21.1",
-    "node-fetch": "^3.2.6",
-    "nodemon": "^3.1.0"
+    "cors": "^2.8.5",
+    "express": "^4.21.2",
+    "node-fetch": "^3.2.6"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.11"
   }
 }
