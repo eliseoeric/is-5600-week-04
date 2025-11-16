@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Fullstack Prints</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 2rem;
+    }
+    h1 {
+      color: #333;
+    }
+    .product {
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      padding: 1rem;
+      margin: 0.5rem 0;
+      background: #fafafa;
+    }
+    .product h2 {
+      margin: 0 0 0.5rem 0;
+    }
+    .controls {
+      margin-top: 1rem;
+    }
+    button {
+      padding: 0.5rem 1rem;
+      margin: 0.2rem;
+      cursor: pointer;
+    }
+    button:disabled {
+      background: #ddd;
+      cursor: not-allowed;
+    }
+  </style>
+</head>
+<body>
+  <h1>Prints</h1>
+  <div id="products"></div>
+
+  <div class="controls">
+    <button id="prev" disabled>Previous</button>
+    <button id="next">Next</button>
+  </div>
+
+  <script>
+    let offset = 0;
+    const limit = 2; // show 2 products per page
+    const container = document.getElementById('products');
+    const prevBtn = document.getElementById('prev');
+    const nextBtn = document.getElementById('next');
+
+    async function loadProducts() {
+      try {
+        const res = await fetch(`/products?limit=${limit}&offset=${offset}`);
+        const products = await res.json();
+
+        container.innerHTML = '';
+
+        if (products.length === 0 && offset > 0) {
+          // no products → go back one page
+          offset -= limit;
+          return loadProducts();
+        }
+
+        products.forEach(p => {
+          const div = document.createElement('div');
+          div.className = 'product';
+          div.innerHTML = `
+            <h2>${p.name}</h2>
+            <p>Price: $${p.price}</p>
+            <p>Tags: ${p.tags.join(', ')}</p>
+          `;
+          container.appendChild(div);
+        });
+
+        // control buttons
+        prevBtn.disabled = offset === 0;
+        nextBtn.disabled = products.length < limit;
+      } catch (err) {
+        console.error('Error loading products:', err);
+      }
+    }
+
+    prevBtn.addEventListener('click', () => {
+      if (offset >= limit) {
+        offset -= limit;
+        loadProducts();
+      }
+    });
+
+    nextBtn.addEventListener('click', () => {
+      offset += limit;
+      loadProducts();
+    });
+
+    // first load
+    loadProducts();
+  </script>
+</body>
+</html>
