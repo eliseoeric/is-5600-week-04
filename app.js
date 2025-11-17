@@ -1,39 +1,96 @@
-const fs = require('fs').promises
-const path = require('path')
-const express = require('express')
+const express = require("express");
+const fs = require("fs");
+const path = require("path");
 
-// Set the port
-const port = process.env.PORT || 3000
-// Boot the app
-const app = express()
-// Register the public directory
-app.use(express.static(__dirname + '/public'));
-// register the routes
-app.get('/products', listProducts)
-app.get('/', handleRoot);
-// Boot the server
-app.listen(port, () => console.log(`Server listening on port ${port}`))
+const app = express();
+const port = process.env.PORT || 3000;
 
-/**
- * Handle the root route
- * @param {object} req
- * @param {object} res
-*/
-function handleRoot(req, res) {
-  res.sendFile(path.join(__dirname, '/index.html'));
+app.use(express.json());
+
+const dbPath = path.join(__dirname, "products.json");
+
+function loadProducts() {
+  return JSON.parse(fs.readFileSync(dbPath, "utf8"));
 }
 
-/**
- * List all products
- * @param {object} req
- * @param {object} res
- */
-async function listProducts(req, res) {
-  const productsFile = path.join(__dirname, 'data/full-products.json')
-  try {
-    const data = await fs.readFile(productsFile)
-    res.json(JSON.parse(data))
-  } catch (err) {
-    res.status(500).json({ error: err.message })
+function saveProducts(products) {
+  fs.writeFileSync(dbPath, JSON.stringify(products, null, 2));
+}
+
+app.get("/products", (req, res) => {
+  let { offset = 0, limit = 10, category, minPrice, maxPrice } = req.query;
+
+  offset = Number(offset);
+  limit = Number(limit);
+
+  let products = loadProducts();
+
+  if (category && category.trim() !== "") {
+    products = products.filter(p =>
+      p.category.toLowerCase().includes(category.toLowerCase())
+    );
   }
-}
+
+  if (minPrice !== undefined && minPrice !== "" && !isNaN(minPrice)) {
+    products = products.filter(p => p.price >= Number(minPrice));
+  }
+
+  if (maxPrice !== undefined && maxPrice !== "" && !isNaN(maxPrice)) {
+    products = products.filter(p => p.price <= Number(maxPrice));
+  }
+
+  const paginated = products.slice(offset, offset + limit);
+
+  res.json({
+    total: products.length,
+    offset,
+    limit,
+    data: paginated
+  });
+});
+
+app.get("/products/:id", (req, res) => {
+  const products = loadProducts();
+  const product = products.find(p => p.id == req.params.id);
+  if (!product) return res.status(404).json({ error: "Not found" });
+  res.json(product);
+});
+
+app.post("/products", (req, res) => {
+  const products = loadProducts();
+  const newProduct = { id: Date.now(), ...req.body };
+  products.push(newProduct);
+  saveProducts(products);
+  res.status(201).json(newProduct);
+});
+
+app.put("/products/:id", (req, res) => {
+  let products = loadProducts();
+  const index = products.findIndex(p => p.id == req.params.id);
+  if (index === -1) return res.status(404).json({ error: "Not found" });
+
+  products[index] = { ...products[index], ...req.body };
+  saveProducts(products);
+
+  res.json(products[index]);
+});
+
+app.delete("/products/:id", (req, res) => {
+  let products = loadProducts();
+  const filtered = products.filter(p => p.id != req.params.id);
+
+  if (filtered.length === products.length)
+    return res.status(404).json({ error: "Not found" });
+
+  saveProducts(filtered);
+
+  res.json({ success: true });
+});
+
+app.get("/", (req, res) => {
+  res.sendFile(path.join(__dirname, "index.html"));
+});
+
+app.use("/", express.static(__dirname));
+
+app.listen(port, () => console.log("Server running on port " + port));
