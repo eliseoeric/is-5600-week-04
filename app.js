@@ -1,39 +1,37 @@
-const fs = require('fs').promises
-const path = require('path')
-const express = require('express')
+// app.js
+const express = require('express');
+const path = require('path');
 
-// Set the port
-const port = process.env.PORT || 3000
-// Boot the app
-const app = express()
-// Register the public directory
-app.use(express.static(__dirname + '/public'));
-// register the routes
-app.get('/products', listProducts)
-app.get('/', handleRoot);
-// Boot the server
-app.listen(port, () => console.log(`Server listening on port ${port}`))
+const api = require('./api');
+const middleware = require('./middleware');
 
-/**
- * Handle the root route
- * @param {object} req
- * @param {object} res
-*/
-function handleRoot(req, res) {
-  res.sendFile(path.join(__dirname, '/index.html'));
-}
+const app = express();
+const port = process.env.PORT || 3000;
 
-/**
- * List all products
- * @param {object} req
- * @param {object} res
- */
-async function listProducts(req, res) {
-  const productsFile = path.join(__dirname, 'data/full-products.json')
-  try {
-    const data = await fs.readFile(productsFile)
-    res.json(JSON.parse(data))
-  } catch (err) {
-    res.status(500).json({ error: err.message })
-  }
-}
+// middleware
+app.use(middleware.cors);
+app.use(express.json()); // body parser
+
+// static frontend (public/*)
+app.use(express.static(path.join(__dirname, 'public')));
+
+// routes
+app.get('/', api.handleRoot);
+app.get('/products', api.listProducts);
+app.get('/products/:id', api.getProduct);
+
+// create, update, delete
+app.post('/products', api.createProduct);
+app.put('/products/:id', api.updateProduct);
+app.delete('/products/:id', api.deleteProduct);
+
+// not found handler (must be after routes)
+app.use(middleware.notFound);
+
+// error handler (must be last)
+app.use(middleware.handleError);
+
+// start
+app.listen(port, () => {
+  console.log(`Server listening on port ${port}`);
+});
