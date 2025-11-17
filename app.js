@@ -1,39 +1,23 @@
-const fs = require('fs').promises
-const path = require('path')
-const express = require('express')
+// app.js
 
-// Set the port
-const port = process.env.PORT || 3000
-// Boot the app
-const app = express()
-// Register the public directory
-app.use(express.static(__dirname + '/public'));
-// register the routes
-app.get('/products', listProducts)
-app.get('/', handleRoot);
-// Boot the server
-app.listen(port, () => console.log(`Server listening on port ${port}`))
+const express = require('express');
+const bodyParser = require('body-parser');
+const api = require('./api');
+const middleware = require('./middleware');
 
-/**
- * Handle the root route
- * @param {object} req
- * @param {object} res
-*/
-function handleRoot(req, res) {
-  res.sendFile(path.join(__dirname, '/index.html'));
-}
+const app = express();
 
-/**
- * List all products
- * @param {object} req
- * @param {object} res
- */
-async function listProducts(req, res) {
-  const productsFile = path.join(__dirname, 'data/full-products.json')
-  try {
-    const data = await fs.readFile(productsFile)
-    res.json(JSON.parse(data))
-  } catch (err) {
-    res.status(500).json({ error: err.message })
-  }
-}
+// Middleware
+app.use(middleware.cors);        // Enable CORS if needed
+app.use(bodyParser.json());      // Parse JSON request bodies
+app.use(express.static(__dirname + '/public')); // Serve static files
+
+// Routes
+app.get('/', api.handleRoot);           // Root route
+app.get('/products', api.listProducts); // List products route
+
+// Start server
+const PORT = 3000;
+app.listen(PORT, () => {
+  console.log(`Server running on http://localhost:${PORT}`);
+});
