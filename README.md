@@ -1,4 +1,4 @@
-# Lab 04 | Fullstack Prints Part 1
+  const { offset = 0, limit = 25 } = options# Lab 04 | Fullstack Prints Part 1
 
 ## Table of Contents
 
