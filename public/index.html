@@ -1,0 +1,107 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>Fullstack Prints</title>
+    <style>
+      :root { --gap:16px; }
+      body { font-family: system-ui, Arial, sans-serif; padding: 24px; margin:0; }
+      h1 { margin: 0 0 16px; }
+      .controls { display:flex; gap:12px; align-items:center; margin: 4px 0 20px; }
+      button { padding: 8px 14px; border:1px solid #222; background:#fff; cursor:pointer; }
+      button:disabled { opacity:.4; cursor:not-allowed; }
+      .grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(220px,1fr)); gap: var(--gap); }
+      .card { display:block; border:1px solid #e5e5e5; border-radius:10px; padding:12px; text-decoration:none; color:inherit; }
+      .thumb { width:100%; height:150px; background:#f7f7f7 center/cover no-repeat; border-radius:6px; }
+      .id { color:#666; font-size:12px; margin-top:8px; }
+      .title { display:block; font-weight:600; margin:6px 0 2px; }
+      .tags { color:#777; font-size:13px; }
+    </style>
+  </head>
+  <body>
+    <h1>Products</h1>
+
+    <div class="controls">
+      <button id="prev">Previous</button>
+      <button id="next">Next</button>
+    </div>
+
+    <div id="grid" class="grid"></div>
+
+    <script>
+      // simple client-side pager
+      const state = { offset: 0, limit: 12, tag: '' };
+
+      window.addEventListener('DOMContentLoaded', load);
+      document.getElementById('prev').addEventListener('click', e => {
+        e.preventDefault();
+        if (state.offset <= 0) return;
+        state.offset = Math.max(0, state.offset - state.limit);
+        load();
+      });
+      document.getElementById('next').addEventListener('click', e => {
+        e.preventDefault();
+        state.offset += state.limit;
+        load();
+      });
+
+      function load() {
+        const qs = `?offset=${state.offset}&limit=${state.limit}${state.tag ? `&tag=${encodeURIComponent(state.tag)}` : ''}`;
+        fetch('/products' + qs, { cache: 'no-store' })
+          .then(r => r.json())
+          .then(items => {
+            // support either an array or {items:[...]}
+            const data = Array.isArray(items) ? items : (items.items || items.products || items.data || []);
+            render(data);
+          })
+          .catch(err => {
+            console.error(err);
+            document.getElementById('grid').innerHTML = `<div>Failed to load products.</div>`;
+          });
+      }
+
+      function render(products) {
+        const g = document.getElementById('grid');
+        document.getElementById('prev').disabled = state.offset <= 0;
+
+        g.innerHTML = products.map(p => {
+          const title = p.title || p.name || p.alt_description || 'Untitled';
+          const tags = normalizeTags(p).join(', ');
+          const img =
+            (p.urls && (p.urls.thumb || p.urls.small)) ||
+            (p.image && (p.image.thumb || p.image)) ||
+            '';
+          const href = (p.links && p.links.html) || '#';
+
+          return `
+            <a class="card" ${href !== '#' ? `href="${href}" target="_blank" rel="noopener"` : ''}>
+              <div class="thumb" style="${img ? `background-image:url('${escapeAttr(img)}')` : ''}"></div>
+              <div class="id">${safe(p.id || '')}</div>
+              <span class="title">${safe(title)}</span>
+              ${tags ? `<div class="tags">${safe(tags)}</div>` : ''}
+            </a>
+          `;
+        }).join('');
+      }
+
+      function normalizeTags(p) {
+        // supports tags as [{title}], ["a","b"], or categories/topics arrays
+        const arr = Array.isArray(p.tags) ? p.tags :
+                    (Array.isArray(p.categories) ? p.categories :
+                    (Array.isArray(p.topics) ? p.topics : []));
+        return arr
+          .map(t => typeof t === 'string' ? t : (t && (t.title || t.name) || ''))
+          .filter(Boolean)
+          .slice(0, 4);
+      }
+
+      // small helpers to avoid accidental HTML injection in strings
+      function safe(s) {
+        return String(s).replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+      }
+      function escapeAttr(s) {
+        return String(s).replace(/["']/g, m => (m === '"' ? '&quot;' : '&#39;'));
+      }
+    </script>
+  </body>
+</html>
