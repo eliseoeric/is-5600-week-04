@@ -37,3 +37,45 @@ async function listProducts(req, res) {
     res.status(500).json({ error: err.message })
   }
 }
+// app.js
+const express = require('express')
+const path = require('path')
+const bodyParser = require('body-parser')
+
+const api = require('./api/api')
+const middleware = require('./api/middleware')
+
+const app = express()
+
+// Serve static files from public
+app.use(express.static(path.join(__dirname, 'public')))
+
+// Register middlewares
+app.use(middleware.cors)
+app.use(bodyParser.json())
+
+// Routes
+app.get('/', api.handleRoot)
+app.get('/products', api.listProducts)
+app.get('/products/:id', api.getProduct)
+
+// Create new product
+app.post('/products', api.createProduct)
+
+// Update existing product
+app.put('/products/:id', api.updateProduct)
+
+// Delete product
+app.delete('/products/:id', api.deleteProduct)
+
+// 404 handler (from middleware)
+app.use(middleware.notFound)
+
+// Error handler (from middleware)
+app.use(middleware.handleError)
+
+// Start server
+const port = process.env.PORT || 3000
+app.listen(port, () => {
+  console.log(`Server listening on port ${port}`)
+})

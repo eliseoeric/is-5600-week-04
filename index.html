@@ -10,3 +10,28 @@
     <script src='/index.js'></script>
   </body>
 </html>
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Products</title>
+</head>
+<body>
+  <h1>Products</h1>
+  <div id="output">Loading...</div>
+
+  <script>
+    async function load () {
+      try {
+        const res = await fetch('/products?limit=10&offset=0')
+        const data = await res.json()
+        const out = document.getElementById('output')
+        out.innerText = 'Total: ' + data.total + '\\n' + JSON.stringify(data.items, null, 2)
+      } catch (e) {
+        document.getElementById('output').innerText = 'Error: ' + e.message
+      }
+    }
+    load()
+  </script>
+</body>
+</html>
