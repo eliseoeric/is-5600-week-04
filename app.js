@@ -2,38 +2,75 @@ const fs = require('fs').promises
 const path = require('path')
 const express = require('express')
 
-// Set the port
-const port = process.env.PORT || 3000
-// Boot the app
 const app = express()
-// Register the public directory
-app.use(express.static(__dirname + '/public'));
-// register the routes
-app.get('/products', listProducts)
-app.get('/', handleRoot);
-// Boot the server
-app.listen(port, () => console.log(`Server listening on port ${port}`))
+const port = 3000
 
-/**
- * Handle the root route
- * @param {object} req
- * @param {object} res
-*/
-function handleRoot(req, res) {
-  res.sendFile(path.join(__dirname, '/index.html'));
+app.use(express.json())
+
+const productsFile = path.join(__dirname, 'data/full-products.json')
+
+let products = []
+
+async function loadProducts() {
+  const data = await fs.readFile(productsFile)
+  products = JSON.parse(data)
 }
 
-/**
- * List all products
- * @param {object} req
- * @param {object} res
- */
-async function listProducts(req, res) {
-  const productsFile = path.join(__dirname, 'data/full-products.json')
-  try {
-    const data = await fs.readFile(productsFile)
-    res.json(JSON.parse(data))
-  } catch (err) {
-    res.status(500).json({ error: err.message })
+loadProducts()
+
+// GET all products
+app.get('/products', (req, res) => {
+  res.json(products)
+})
+
+// GET single product
+app.get('/products/:id', (req, res) => {
+  const id = req.params.id
+  const product = products.find(p => p.id === id)
+
+  if (!product) {
+    return res.status(404).json({ error: 'Product not found' })
   }
-}
+
+  res.json(product)
+})
+
+// CREATE product
+app.post('/products', (req, res) => {
+  const newProduct = req.body
+  products.push(newProduct)
+
+  res.status(201).json(newProduct)
+})
+
+// UPDATE product
+app.put('/products/:id', (req, res) => {
+  const id = req.params.id
+  const index = products.findIndex(p => p.id === id)
+
+  if (index === -1) {
+    return res.status(404).json({ error: 'Product not found' })
+  }
+
+  products[index] = { ...products[index], ...req.body }
+
+  res.json(products[index])
+})
+
+// DELETE product
+app.delete('/products/:id', (req, res) => {
+  const id = req.params.id
+  const index = products.findIndex(p => p.id === id)
+
+  if (index === -1) {
+    return res.status(404).json({ error: 'Product not found' })
+  }
+
+  products.splice(index, 1)
+
+  res.json({ message: 'Deleted successfully' })
+})
+
+app.listen(port, () => {
+  console.log(`Server running on http://localhost:${port}`)
+})
