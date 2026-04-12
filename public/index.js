@@ -9,7 +9,7 @@ listPrints({offset, limit, tag})
 function listPrints ({offset = 0, limit = 25, tag}) {
   const endpoint = '/products'
   const qs = `?offset=${offset}&limit=${limit}&tag=${tag || ''}`
-  return fetchJSON(endpoint + qs)
+  return fetchJSON(endpoint + qs).then(data => Array.isArray(data) ? data : data.products)
 }
 
 function fetchJSON (url) {
