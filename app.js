@@ -1,122 +1,182 @@
+const fs = require("fs").promises;
+const path = require("path");
 const express = require("express");
+
+const port = process.env.PORT || 3000;
 const app = express();
 
-// Load products
-let products = require("./data/products.json");
-
-// Middleware
 app.use(express.json());
+app.use(express.static(__dirname + "/public"));
 
 // ----------------------
-// GET all products (filter + pagination)
+// ROOT
 // ----------------------
-app.get("/products", (req, res) => {
-  let { page = 1, limit = 10, name } = req.query;
+app.get("/", handleRoot);
 
-  // Convert to numbers
-  page = parseInt(page);
-  limit = parseInt(limit);
+// ----------------------
+// GET ALL PRODUCTS (with filter + pagination)
+// ----------------------
+app.get("/products", listProducts);
 
-  let result = [...products];
+// ----------------------
+// GET SINGLE PRODUCT
+// ----------------------
+app.get("/products/:id", getProduct);
 
-  // Filter by name
-  if (name) {
-    result = result.filter(p =>
-      p.name.toLowerCase().includes(name.toLowerCase())
-    );
+// ----------------------
+// CREATE PRODUCT
+// ----------------------
+app.post("/products", createProduct);
+
+// ----------------------
+// UPDATE PRODUCT
+// ----------------------
+app.put("/products/:id", updateProduct);
+
+// ----------------------
+// DELETE PRODUCT
+// ----------------------
+app.delete("/products/:id", deleteProduct);
+
+// ----------------------
+// START SERVER
+// ----------------------
+app.listen(port, () => {
+  console.log(`Server listening on port ${port}`);
+});
+
+// ======================
+// FUNCTIONS
+// ======================
+
+function handleRoot(req, res) {
+  res.sendFile(path.join(__dirname, "/index.html"));
+}
+
+// ----------------------
+// LIST PRODUCTS
+// ----------------------
+async function listProducts(req, res) {
+  const productsFile = path.join(__dirname, "data/products.json");
+
+  try {
+    const data = await fs.readFile(productsFile);
+    let products = JSON.parse(data);
+
+    let { page = 1, limit = 10, name } = req.query;
+
+    page = parseInt(page);
+    limit = parseInt(limit);
+
+    // FILTER
+    if (name) {
+      products = products.filter(p =>
+        p.name.toLowerCase().includes(name.toLowerCase())
+      );
+    }
+
+    // PAGINATION
+    const start = (page - 1) * limit;
+    const end = start + limit;
+
+    res.json(products.slice(start, end));
+  } catch (err) {
+    res.status(500).json({ error: err.message });
   }
-
-  // Pagination
-  const start = (page - 1) * limit;
-  const end = start + limit;
-
-  res.json({
-    total: result.length,
-    page,
-    limit,
-    data: result.slice(start, end)
-  });
-});
+}
 
 // ----------------------
-// GET single product
+// GET PRODUCT
 // ----------------------
-app.get("/products/:id", (req, res) => {
-  const id = parseInt(req.params.id);
+async function getProduct(req, res) {
+  const productsFile = path.join(__dirname, "data/products.json");
 
-  const product = products.find(p => p.id === id);
+  try {
+    const data = await fs.readFile(productsFile);
+    const products = JSON.parse(data);
 
-  if (!product) {
-    return res.status(404).json({ message: "Product not found" });
+    const product = products.find(p => p.id == req.params.id);
+
+    if (!product) {
+      return res.status(404).json({ message: "Not found" });
+    }
+
+    res.json(product);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
   }
-
-  res.json(product);
-});
+}
 
 // ----------------------
-// CREATE product
+// CREATE PRODUCT
 // ----------------------
-app.post("/products", (req, res) => {
-  const { name, price } = req.body;
+async function createProduct(req, res) {
+  const productsFile = path.join(__dirname, "data/products.json");
 
-  if (!name || !price) {
-    return res.status(400).json({ message: "Name and price are required" });
+  try {
+    const data = await fs.readFile(productsFile);
+    let products = JSON.parse(data);
+
+    const newProduct = {
+      id: products.length + 1,
+      ...req.body
+    };
+
+    products.push(newProduct);
+
+    await fs.writeFile(productsFile, JSON.stringify(products, null, 2));
+
+    res.status(201).json(newProduct);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
   }
-
-  const newProduct = {
-    id: products.length > 0 ? products[products.length - 1].id + 1 : 1,
-    name,
-    price
-  };
-
-  products.push(newProduct);
-
-  res.status(201).json(newProduct);
-});
+}
 
 // ----------------------
-// UPDATE product
+// UPDATE PRODUCT
 // ----------------------
-app.put("/products/:id", (req, res) => {
-  const id = parseInt(req.params.id);
+async function updateProduct(req, res) {
+  const productsFile = path.join(__dirname, "data/products.json");
 
-  const index = products.findIndex(p => p.id === id);
+  try {
+    const data = await fs.readFile(productsFile);
+    let products = JSON.parse(data);
 
-  if (index === -1) {
-    return res.status(404).json({ message: "Product not found" });
+    const index = products.findIndex(p => p.id == req.params.id);
+
+    if (index === -1) {
+      return res.status(404).json({ message: "Not found" });
+    }
+
+    products[index] = {
+      ...products[index],
+      ...req.body
+    };
+
+    await fs.writeFile(productsFile, JSON.stringify(products, null, 2));
+
+    res.json(products[index]);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
   }
-
-  products[index] = {
-    ...products[index],
-    ...req.body
-  };
-
-  res.json(products[index]);
-});
+}
 
 // ----------------------
-// DELETE product
+// DELETE PRODUCT
 // ----------------------
-app.delete("/products/:id", (req, res) => {
-  const id = parseInt(req.params.id);
+async function deleteProduct(req, res) {
+  const productsFile = path.join(__dirname, "data/products.json");
 
-  const index = products.findIndex(p => p.id === id);
+  try {
+    const data = await fs.readFile(productsFile);
+    let products = JSON.parse(data);
 
-  if (index === -1) {
-    return res.status(404).json({ message: "Product not found" });
+    const newProducts = products.filter(p => p.id != req.params.id);
+
+    await fs.writeFile(productsFile, JSON.stringify(newProducts, null, 2));
+
+    res.json({ message: "Deleted" });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
   }
-
-  const deleted = products.splice(index, 1);
-
-  res.json({
-    message: "Product deleted",
-    deleted: deleted[0]
-  });
-});
-
-// ----------------------
-// Start server
-// ----------------------
-app.listen(3000, () => {
-  console.log("Server running on http://localhost:3000");
-});
+}
