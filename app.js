@@ -2,65 +2,41 @@ const fs = require("fs").promises;
 const path = require("path");
 const express = require("express");
 
-const port = process.env.PORT || 3000;
 const app = express();
+const port = process.env.PORT || 3000;
 
+// Middleware
 app.use(express.json());
 app.use(express.static(__dirname + "/public"));
+
+// Routes
+app.get("/", handleRoot);
+app.get("/products", listProducts);
+app.get("/products/:id", getProduct);
+app.post("/products", createProduct);
+app.put("/products/:id", updateProduct);
+app.delete("/products/:id", deleteProduct);
+
+// Start server
+app.listen(port, () => {
+  console.log(`Server running on http://localhost:${port}`);
+});
 
 // ----------------------
 // ROOT
 // ----------------------
-app.get("/", handleRoot);
-
-// ----------------------
-// GET ALL PRODUCTS (with filter + pagination)
-// ----------------------
-app.get("/products", listProducts);
-
-// ----------------------
-// GET SINGLE PRODUCT
-// ----------------------
-app.get("/products/:id", getProduct);
-
-// ----------------------
-// CREATE PRODUCT
-// ----------------------
-app.post("/products", createProduct);
-
-// ----------------------
-// UPDATE PRODUCT
-// ----------------------
-app.put("/products/:id", updateProduct);
-
-// ----------------------
-// DELETE PRODUCT
-// ----------------------
-app.delete("/products/:id", deleteProduct);
-
-// ----------------------
-// START SERVER
-// ----------------------
-app.listen(port, () => {
-  console.log(`Server listening on port ${port}`);
-});
-
-// ======================
-// FUNCTIONS
-// ======================
-
 function handleRoot(req, res) {
   res.sendFile(path.join(__dirname, "/index.html"));
 }
 
 // ----------------------
-// LIST PRODUCTS
+// GET ALL PRODUCTS (filter + pagination)
 // ----------------------
 async function listProducts(req, res) {
-  const productsFile = path.join(__dirname, "data/products.json");
+  const file = path.join(__dirname, "data/products.json");
 
   try {
-    const data = await fs.readFile(productsFile);
+    let data = await fs.readFile(file);
     let products = JSON.parse(data);
 
     let { page = 1, limit = 10, name } = req.query;
@@ -68,14 +44,14 @@ async function listProducts(req, res) {
     page = parseInt(page);
     limit = parseInt(limit);
 
-    // FILTER
+    // Filter
     if (name) {
       products = products.filter(p =>
         p.name.toLowerCase().includes(name.toLowerCase())
       );
     }
 
-    // PAGINATION
+    // Pagination
     const start = (page - 1) * limit;
     const end = start + limit;
 
@@ -86,19 +62,19 @@ async function listProducts(req, res) {
 }
 
 // ----------------------
-// GET PRODUCT
+// GET SINGLE PRODUCT
 // ----------------------
 async function getProduct(req, res) {
-  const productsFile = path.join(__dirname, "data/products.json");
+  const file = path.join(__dirname, "data/products.json");
 
   try {
-    const data = await fs.readFile(productsFile);
-    const products = JSON.parse(data);
+    let data = await fs.readFile(file);
+    let products = JSON.parse(data);
 
     const product = products.find(p => p.id == req.params.id);
 
     if (!product) {
-      return res.status(404).json({ message: "Not found" });
+      return res.status(404).json({ message: "Product not found" });
     }
 
     res.json(product);
@@ -111,10 +87,10 @@ async function getProduct(req, res) {
 // CREATE PRODUCT
 // ----------------------
 async function createProduct(req, res) {
-  const productsFile = path.join(__dirname, "data/products.json");
+  const file = path.join(__dirname, "data/products.json");
 
   try {
-    const data = await fs.readFile(productsFile);
+    let data = await fs.readFile(file);
     let products = JSON.parse(data);
 
     const newProduct = {
@@ -124,7 +100,7 @@ async function createProduct(req, res) {
 
     products.push(newProduct);
 
-    await fs.writeFile(productsFile, JSON.stringify(products, null, 2));
+    await fs.writeFile(file, JSON.stringify(products, null, 2));
 
     res.status(201).json(newProduct);
   } catch (err) {
@@ -136,16 +112,16 @@ async function createProduct(req, res) {
 // UPDATE PRODUCT
 // ----------------------
 async function updateProduct(req, res) {
-  const productsFile = path.join(__dirname, "data/products.json");
+  const file = path.join(__dirname, "data/products.json");
 
   try {
-    const data = await fs.readFile(productsFile);
+    let data = await fs.readFile(file);
     let products = JSON.parse(data);
 
     const index = products.findIndex(p => p.id == req.params.id);
 
     if (index === -1) {
-      return res.status(404).json({ message: "Not found" });
+      return res.status(404).json({ message: "Product not found" });
     }
 
     products[index] = {
@@ -153,7 +129,7 @@ async function updateProduct(req, res) {
       ...req.body
     };
 
-    await fs.writeFile(productsFile, JSON.stringify(products, null, 2));
+    await fs.writeFile(file, JSON.stringify(products, null, 2));
 
     res.json(products[index]);
   } catch (err) {
@@ -165,17 +141,17 @@ async function updateProduct(req, res) {
 // DELETE PRODUCT
 // ----------------------
 async function deleteProduct(req, res) {
-  const productsFile = path.join(__dirname, "data/products.json");
+  const file = path.join(__dirname, "data/products.json");
 
   try {
-    const data = await fs.readFile(productsFile);
+    let data = await fs.readFile(file);
     let products = JSON.parse(data);
 
     const newProducts = products.filter(p => p.id != req.params.id);
 
-    await fs.writeFile(productsFile, JSON.stringify(newProducts, null, 2));
+    await fs.writeFile(file, JSON.stringify(newProducts, null, 2));
 
-    res.json({ message: "Deleted" });
+    res.json({ message: "Product deleted" });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
