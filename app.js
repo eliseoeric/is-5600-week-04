@@ -1,39 +1,81 @@
-const fs = require('fs').promises
 const path = require('path')
-const express = require('express')
-
-// Set the port
-const port = process.env.PORT || 3000
-// Boot the app
-const app = express()
-// Register the public directory
-app.use(express.static(__dirname + '/public'));
-// register the routes
-app.get('/products', listProducts)
-app.get('/', handleRoot);
-// Boot the server
-app.listen(port, () => console.log(`Server listening on port ${port}`))
+const Products = require('./products')
+const autoCatch = require('./lib/auto-catch')
 
 /**
- * Handle the root route
- * @param {object} req
- * @param {object} res
-*/
+ * Handle root
+ */
 function handleRoot(req, res) {
-  res.sendFile(path.join(__dirname, '/index.html'));
+  res.sendFile(path.join(__dirname, 'public/index.html'))
 }
 
 /**
- * List all products
- * @param {object} req
- * @param {object} res
+ * List products
  */
 async function listProducts(req, res) {
-  const productsFile = path.join(__dirname, 'data/full-products.json')
-  try {
-    const data = await fs.readFile(productsFile)
-    res.json(JSON.parse(data))
-  } catch (err) {
-    res.status(500).json({ error: err.message })
-  }
+  const { offset = 0, limit = 25, tag } = req.query
+
+  res.json(await Products.list({
+    offset: Number(offset),
+    limit: Number(limit),
+    tag
+  }))
 }
+
+/**
+ * Get single product
+ */
+async function getProduct(req, res, next) {
+  const { id } = req.params
+
+  const product = await Products.get(id)
+
+  if (!product) return next()
+
+  res.json(product)
+}
+
+/**
+ * Create product (already given)
+ */
+async function createProduct(req, res) {
+  console.log('Created:', req.body)
+
+  res.json(req.body)
+}
+
+/**
+ * DELETE product (NEW)
+ */
+async function deleteProduct(req, res) {
+  const { id } = req.params
+
+  console.log(`Deleted product: ${id}`)
+
+  res.status(202).json({
+    message: `Product ${id} deleted (fake)`
+  })
+}
+
+/**
+ * UPDATE product (NEW)
+ */
+async function updateProduct(req, res) {
+  const { id } = req.params
+
+  console.log(`Updated product: ${id}`, req.body)
+
+  res.status(200).json({
+    message: `Product ${id} updated (fake)`,
+    data: req.body
+  })
+}
+
+module.exports = autoCatch({
+  handleRoot,
+  listProducts,
+  getProduct,
+  createProduct,
+  deleteProduct,
+  updateProduct
+})

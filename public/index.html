@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Products</title>
+</head>
+<body>
+  <h1>Product Server Running</h1>
+  <pre id="output"></pre>
+
+  <script>
+    fetch('/products')
+      .then(res => res.json())
+      .then(data => {
+        document.getElementById('output').textContent =
+          JSON.stringify(data, null, 2)
+      })
+  </script>
+</body>
+</html>
