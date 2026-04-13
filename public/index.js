@@ -67,20 +67,27 @@ function renderButtons ({offset, limit, tag}) {
 }
 
 function renderPrint (print) {
-  console.log(print)
   return html`
     <div class="fl w-50 w-25-m w-20-l pa2">
-      <a href="${print.links.html}" target="_blank" class="db link dim tc">
-        <div style="background: url(${print.urls.thumb})" class="w-100 db outline black-10 h4 cover" alt="${print.alt_description}">
+      <a href="${print.links?.html || '#'}" target="_blank" class="db link dim tc">
+        
+        <div 
+          style="background: url(${print.urls?.thumb || ''})" 
+          class="w-100 db outline black-10 h4 cover">
         </div>
+
         <dl class="mt2 f6 lh-copy">
           <dt class="clip">Title</dt>
           <dd class="ml0 black truncate w-100">
-            ${print.tags.slice(0, 3).map(({title}) => title).join(', ')}
+            ${(print.tags || []).slice(0, 3).map(t => t.title).join(', ')}
           </dd>
+
           <dt class="clip">Artist</dt>
-          <dd class="ml0 gray truncate w-100">${print.user.first_name} ${print.user.last_name}</dd>
+          <dd class="ml0 gray truncate w-100">
+            ${print.user?.first_name || ''} ${print.user?.last_name || ''}
+          </dd>
         </dl>
+
       </a>
     </div>
   `
