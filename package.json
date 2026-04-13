@@ -1,7 +1,7 @@
 {
   "name": "nodejs",
   "version": "1.0.0",
-  "description": "",
+  "description": "## Table of Contents",
   "main": "index.js",
   "scripts": {
     "start": "nodemon app.js",
@@ -12,8 +12,11 @@
   "license": "ISC",
   "dependencies": {
     "@types/node": "^18.0.6",
-    "express": "^4.21.1",
+    "express": "^4.22.1",
     "node-fetch": "^3.2.6",
     "nodemon": "^3.1.0"
+  },
+  "directories": {
+    "lib": "lib"
   }
 }
