@@ -1,0 +1,6 @@
+module.exports = {
+  list,
+  get,
+  delete: remove,
+  update
+}
